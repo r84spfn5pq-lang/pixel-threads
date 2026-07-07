@@ -99,13 +99,15 @@ exports.handler = async function(event) {
   const shipping = session.shipping_details;
   const customer = session.customer_details;
 
-  if (!shipping?.address) {
-    console.error('No shipping address after full session fetch for', sessionId);
-    console.error('customer_details:', JSON.stringify(customer));
+  const shippingAddress = shipping?.address || customer?.address;
+  const shippingName = shipping?.name || customer?.name;
+
+  if (!shippingAddress) {
+    console.error('No shipping address for', sessionId);
     return { statusCode: 200, body: 'OK' };
   }
 
-  const nameParts = (shipping.name || customer?.name || 'Customer').trim().split(/\s+/);
+  const nameParts = (shippingName || 'Customer').trim().split(/\s+/);
   const firstName = nameParts[0] || 'Customer';
   const lastName  = nameParts.slice(1).join(' ') || '.';
 
@@ -124,12 +126,12 @@ exports.handler = async function(event) {
       last_name:  lastName,
       email:      customer?.email || '',
       phone:      customer?.phone || '',
-      country:    shipping.address.country,
-      region:     shipping.address.state || '',
-      address1:   shipping.address.line1,
-      address2:   shipping.address.line2 || '',
-      city:       shipping.address.city,
-      zip:        shipping.address.postal_code,
+      country:    shippingAddress.country,
+      region:     shippingAddress.state || '',
+      address1:   shippingAddress.line1,
+      address2:   shippingAddress.line2 || '',
+      city:       shippingAddress.city,
+      zip:        shippingAddress.postal_code,
     },
   });
 
