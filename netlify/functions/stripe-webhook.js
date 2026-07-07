@@ -135,10 +135,23 @@ exports.handler = async function(event) {
     },
   });
 
+  // Look up the real shop ID from Printify to avoid mis-configuration
+  let shopId = process.env.PRINTIFY_SHOP_ID;
+  try {
+    const shops = await httpsGet('api.printify.com', '/v1/shops.json', {
+      'Authorization': `Bearer ${process.env.PRINTIFY_API_KEY}`,
+      'User-Agent': 'PixelThreads/1.0',
+    });
+    console.log('Printify shops:', JSON.stringify(shops));
+    if (Array.isArray(shops) && shops.length > 0) shopId = String(shops[0].id);
+  } catch (e) {
+    console.error('Could not fetch shops:', e.message);
+  }
+
   try {
     const res = await httpsPost(
       'api.printify.com',
-      `/v1/shops/${process.env.PRINTIFY_SHOP_ID}/orders.json`,
+      `/v1/shops/${shopId}/orders.json`,
       {
         'Authorization': `Bearer ${process.env.PRINTIFY_API_KEY}`,
         'Content-Type': 'application/json',
