@@ -1,0 +1,9 @@
+{
+  "name": "pixel-threads",
+  "private": true,
+  "version": "1.0.0",
+  "devDependencies": {
+    "@netlify/blobs": "^10.7.9",
+    "netlify-cli": "^26.2.0"
+  }
+}

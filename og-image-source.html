@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{width:1200px;height:630px;overflow:hidden;background:#050012;font-family:'Press Start 2P',monospace}
+
+  .stars div{position:absolute;background:#fff}
+  .scan{position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.13) 3px,rgba(0,0,0,.13) 5px);pointer-events:none}
+
+  .stage{position:relative;width:1200px;height:630px}
+
+  .ghost{position:absolute;left:47px;top:47px;width:1113px;height:543px;border:4px solid rgba(0,255,136,.4)}
+  .card{position:absolute;left:40px;top:40px;width:1113px;height:543px;background:#0e0025;border:4px solid #00ff88;display:flex;align-items:center;padding:0 64px;gap:56px;box-sizing:border-box}
+
+  .left{flex:1;display:flex;flex-direction:column;}
+  .eyebrow{font-size:16px;color:#ff00ff;text-shadow:0 0 10px #ff00ff;margin-bottom:26px;letter-spacing:1px}
+  .eyebrow::before{content:'\25B6 ';color:#ff00ff}
+
+  .logo{line-height:1.32}
+  .logo .l1, .logo .l2{font-size:82px;font-weight:400;display:block;text-shadow:5px 5px 0 #000,0 0 26px currentColor}
+  .logo .l1{color:#00ffff}
+  .logo .l2{color:#ff00ff}
+
+  .divider{display:flex;gap:10px;margin:26px 0}
+  .divider i{width:14px;height:14px;transform:rotate(45deg);display:block}
+  .divider i:nth-child(1){background:#00ff88}
+  .divider i:nth-child(2){background:#00ffff}
+  .divider i:nth-child(3){background:#ff00ff}
+  .divider i:nth-child(4){background:#ffff00}
+  .divider i:nth-child(5){background:#00ffff}
+  .divider i:nth-child(6){background:#00ff88}
+
+  .tag{font-size:18px;color:#00ff88;text-shadow:0 0 10px #00ff88;letter-spacing:1px}
+
+  .right{width:330px;display:flex;align-items:center;justify-content:center}
+  .ship{position:relative;width:352px;height:352px;filter:drop-shadow(0 0 24px rgba(0,255,255,.55)) drop-shadow(0 0 50px rgba(255,0,255,.25))}
+  .ship div{position:absolute}
+
+  .foot{position:absolute;left:64px;bottom:34px;font-size:15px;color:#888899;letter-spacing:1px}
+  .badge{position:absolute;right:64px;bottom:34px;font-size:13px;color:#050012;background:#ffff00;border:3px solid #fff;padding:8px 12px;box-shadow:4px 4px 0 #fff}
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="stars">
+    <div style="left:70px;top:38px;width:3px;height:3px;opacity:.7"></div>
+    <div style="left:150px;top:80px;width:2px;height:2px;opacity:.5"></div>
+    <div style="left:260px;top:55px;width:3px;height:3px;opacity:.8"></div>
+    <div style="left:520px;top:34px;width:2px;height:2px;opacity:.6"></div>
+    <div style="left:640px;top:62px;width:2px;height:2px;opacity:.5"></div>
+    <div style="left:96px;top:150px;width:2px;height:2px;opacity:.5"></div>
+    <div style="left:60px;top:560px;width:3px;height:3px;opacity:.6"></div>
+    <div style="left:300px;top:540px;width:2px;height:2px;opacity:.5"></div>
+    <div style="left:900px;top:60px;width:3px;height:3px;opacity:.7"></div>
+    <div style="left:1080px;top:90px;width:2px;height:2px;opacity:.6"></div>
+    <div style="left:1140px;top:44px;width:3px;height:3px;opacity:.8"></div>
+    <div style="left:950px;top:560px;width:2px;height:2px;opacity:.5"></div>
+    <div style="left:1120px;top:520px;width:3px;height:3px;opacity:.7"></div>
+  </div>
+
+  <div class="ghost"></div>
+  <div class="card">
+    <div class="left">
+      <div class="eyebrow">8-BIT SHIRT SHOP</div>
+      <div class="logo"><span class="l1">PIXEL</span><span class="l2">THREADS</span></div>
+      <div class="divider"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="tag">RETRO GAMING T-SHIRTS</div>
+    </div>
+    <div class="right">
+      <div class="ship" style="--u:22px">
+        <div style="left:calc(7*var(--u));top:calc(0*var(--u));width:calc(2*var(--u));height:calc(2*var(--u));background:#ccccff"></div>
+        <div style="left:calc(6*var(--u));top:calc(2*var(--u));width:calc(4*var(--u));height:calc(2*var(--u));background:#aaaadd"></div>
+        <div style="left:calc(5*var(--u));top:calc(4*var(--u));width:calc(6*var(--u));height:calc(4*var(--u));background:#ffffff"></div>
+        <div style="left:calc(4*var(--u));top:calc(6*var(--u));width:calc(2*var(--u));height:calc(4*var(--u));background:#ff00ff"></div>
+        <div style="left:calc(10*var(--u));top:calc(6*var(--u));width:calc(2*var(--u));height:calc(4*var(--u));background:#ff00ff"></div>
+        <div style="left:calc(6*var(--u));top:calc(8*var(--u));width:calc(4*var(--u));height:calc(2*var(--u));background:#888899"></div>
+        <div style="left:calc(6*var(--u));top:calc(10*var(--u));width:calc(1*var(--u));height:calc(2*var(--u));background:#ff8800"></div>
+        <div style="left:calc(7*var(--u));top:calc(11*var(--u));width:calc(2*var(--u));height:calc(4*var(--u));background:#ffff00"></div>
+        <div style="left:calc(9*var(--u));top:calc(10*var(--u));width:calc(1*var(--u));height:calc(2*var(--u));background:#ff8800"></div>
+      </div>
+    </div>
+    <div class="foot">pixelthreads.netlify.app</div>
+  </div>
+  <div class="scan"></div>
+</div>
+</body>
+</html>
