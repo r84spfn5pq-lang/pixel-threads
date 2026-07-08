@@ -87,17 +87,19 @@ exports.handler = async function(event) {
     return { statusCode: 200, body: 'OK' };
   }
 
-  // Extract shipping address — only from shipping_details (customer_details.address is billing only)
+  // Extract shipping address.
+  // Priority: shipping_details (dedicated shipping form) → customer_details.address (billing address,
+  // always populated when billing_address_collection: 'required' is set on the checkout session).
   const shippingInfo = session.shipping_details || session.shipping;
   const customer = session.customer_details;
-  const shippingAddress = shippingInfo?.address;
+  const shippingAddress = (shippingInfo?.address?.line1 ? shippingInfo.address : null) || customer?.address;
   const shippingName = shippingInfo?.name || customer?.name;
 
   console.log('shippingAddress resolved:', JSON.stringify(shippingAddress));
   console.log('shippingName resolved:', shippingName);
 
   if (!shippingAddress || !shippingAddress.line1) {
-    console.error('No valid shipping address (line1 missing). Cannot create Printify order.');
+    console.error('No valid shipping address (line1 missing). shipping_details:', JSON.stringify(shippingInfo), 'customer_details.address:', JSON.stringify(customer?.address));
     return { statusCode: 200, body: 'OK' };
   }
 
