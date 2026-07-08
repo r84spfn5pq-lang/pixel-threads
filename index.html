@@ -510,7 +510,6 @@ footer{background:var(--bg2);border-top:4px solid var(--green);padding:40px 24px
       <div class="lives" aria-hidden="true"><div class="heart"></div><div class="heart"></div><div class="heart"></div></div>
     </div>
   </div>
-  <button class="btn-orders" onclick="openOrderHist()" aria-label="View order history">[ORDERS]</button>
   <button class="btn-cart" id="btn-cart" aria-label="Open cart" aria-expanded="false">
     [CART]<span class="cart-badge" id="cart-count" aria-live="polite">0</span>
   </button>
@@ -578,6 +577,10 @@ footer{background:var(--bg2);border-top:4px solid var(--green);padding:40px 24px
   <div class="sec-hd">
     <h2 class="sec-title">ITEM SELECT</h2>
     <p class="sec-sub">CHOOSE YOUR FIGHTER... ER, SHIRT</p>
+  </div>
+
+  <div style="text-align:center;margin-bottom:18px">
+    <button onclick="openOrderHist()" style="font-family:'Press Start 2P',monospace;font-size:7px;background:transparent;color:var(--yellow);border:2px solid var(--yellow);padding:8px 16px;cursor:none">★ VIEW MY PAST ORDERS</button>
   </div>
 
   <div class="filters" role="group" aria-label="Filter by category">
@@ -658,6 +661,7 @@ footer{background:var(--bg2);border-top:4px solid var(--green);padding:40px 24px
   <div class="ft-logo">PIXEL THREADS</div>
   <nav class="ft-links" aria-label="Footer">
     <a href="#">ABOUT</a><a href="#">SIZING</a><a href="#">RETURNS</a><a href="#">ETSY SHOP</a><a href="#">CONTACT</a>
+    <a href="#" onclick="openOrderHist();return false;" style="color:var(--yellow);border:2px solid var(--yellow);padding:4px 10px">★ MY ORDERS</a>
   </nav>
   <p class="ft-copy">
     © 2024 PIXEL THREADS — SPACE STATION CO.<br>
