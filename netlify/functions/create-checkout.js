@@ -1,7 +1,6 @@
 const https = require('https');
 
 function stripePost(path, secretKey, params) {
-  // Keys keep literal brackets — only values are URI-encoded (matches how Stripe SDK sends requests)
   const body = Object.entries(params)
     .map(([k, v]) => `${k}=${encodeURIComponent(String(v))}`)
     .join('&');
@@ -63,14 +62,16 @@ exports.handler = async function(event) {
     const fulfillment = JSON.stringify(
       items.map(item => ({ p: item.productId, v: item.variantId }))
     );
-    console.log('fulfillment:', fulfillment);
-    console.log('first item keys:', Object.keys(items[0]).join(','));
 
     const params = {
       mode: 'payment',
       success_url: `${origin}/?order=success&session={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/?order=cancelled`,
       'payment_method_types[0]': 'card',
+      // Required billing address guarantees customer_details.address is always populated.
+      // This is the most reliable way to collect a full address in Stripe Checkout.
+      billing_address_collection: 'required',
+      // Shipping collection puts address in shipping_details when it works.
       'shipping_address_collection[allowed_countries][0]': 'US',
       'shipping_address_collection[allowed_countries][1]': 'CA',
       'shipping_address_collection[allowed_countries][2]': 'GB',
@@ -103,6 +104,8 @@ exports.handler = async function(event) {
       console.error('No URL in Stripe response:', JSON.stringify(session));
       throw new Error('Stripe did not return a checkout URL');
     }
+
+    console.log('Session created:', session.id, '| billing_address_collection:', session.billing_address_collection, '| shipping_address_collection:', JSON.stringify(session.shipping_address_collection));
 
     return {
       statusCode: 200,
