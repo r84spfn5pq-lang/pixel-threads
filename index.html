@@ -113,6 +113,8 @@ body{background:var(--bg);color:var(--green);font-family:'Press Start 2P',monosp
 .card.tag-hot::before{content:'HOT!';background:var(--orange);color:var(--white)}
 
 .card-img{width:100%;height:210px;background:#08001a;display:flex;align-items:center;justify-content:center;border-bottom:4px solid var(--green);overflow:hidden;position:relative}
+.card-img::after{content:'⊕ VIEW';font-family:'Press Start 2P',monospace;font-size:7px;position:absolute;inset:0;background:rgba(0,255,255,.08);color:var(--cyan);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;letter-spacing:2px;text-shadow:0 0 10px var(--cyan)}
+.card:hover .card-img::after{opacity:1}
 .card-img img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .35s}
 .card:hover .card-img img{transform:scale(1.06)}
 .card-img svg{transition:transform .3s}
@@ -190,6 +192,45 @@ body{background:var(--bg);color:var(--green);font-family:'Press Start 2P',monosp
 #konami p{font-size:11px;color:var(--green);line-height:2}
 #konami small{font-size:7px;color:var(--gray)}
 #konami button{font-family:'Press Start 2P',monospace;font-size:9px;background:var(--green);color:var(--bg);border:4px solid var(--white);padding:13px 22px;cursor:pointer;box-shadow:5px 5px 0 var(--white);margin-top:8px}
+
+/* ── ORDERS BUTTON ── */
+.btn-orders{font-family:'Press Start 2P',monospace;font-size:8px;background:transparent;color:var(--yellow);border:3px solid var(--yellow);padding:8px 12px;cursor:none;margin-right:8px;transition:all .1s}
+.btn-orders:hover{background:var(--yellow);color:var(--bg)}
+
+/* ── ORDER CONFIRMATION MODAL ── */
+#order-confirm{display:none;position:fixed;inset:0;z-index:9700;align-items:center;justify-content:center;padding:16px}
+#order-confirm.open{display:flex}
+.oc-backdrop{position:absolute;inset:0;background:rgba(5,0,18,.95)}
+.oc-panel{position:relative;background:var(--card);border:4px solid var(--green);box-shadow:0 0 0 1px var(--green),8px 8px 0 var(--green),0 0 80px rgba(0,255,136,.22);max-width:520px;width:100%;max-height:88vh;overflow-y:auto;padding:32px}
+.oc-title{font-size:15px;color:var(--green);text-shadow:0 0 20px var(--green);margin-bottom:6px;text-align:center}
+.oc-subtitle{font-size:7px;color:var(--gray);text-align:center;margin-bottom:28px;line-height:2.4}
+.oc-item{display:flex;gap:12px;align-items:center;padding:10px 0;border-bottom:2px solid rgba(0,255,136,.15)}
+.oc-thumb{width:56px;height:56px;background:#08001a;border:2px solid var(--green);object-fit:cover;flex-shrink:0}
+.oc-item-info{flex:1}
+.oc-item-name{font-size:7px;color:var(--white);margin-bottom:4px}
+.oc-item-sub{font-size:6px;color:var(--gray);margin-bottom:3px}
+.oc-item-price{font-size:7px;color:var(--yellow)}
+.oc-total{font-size:12px;color:var(--yellow);text-align:right;padding-top:14px;border-top:3px solid var(--green);margin:14px 0}
+.oc-email-note{font-size:6px;color:var(--gray);text-align:center;line-height:2.4;margin-bottom:20px;padding:12px;border:2px solid rgba(0,255,136,.2);background:rgba(0,255,136,.04)}
+.oc-close{font-family:'Press Start 2P',monospace;font-size:9px;background:var(--green);color:var(--bg);border:4px solid var(--white);padding:14px;cursor:none;box-shadow:5px 5px 0 var(--white);width:100%;transition:box-shadow .1s,transform .1s}
+.oc-close:hover{box-shadow:2px 2px 0 var(--white);transform:translate(3px,3px)}
+
+/* ── ORDER HISTORY PANEL ── */
+#order-hist{position:fixed;top:0;left:-440px;width:420px;height:100vh;background:var(--bg2);border-right:4px solid var(--yellow);z-index:9500;transition:left .3s;overflow-y:auto;padding:22px;display:flex;flex-direction:column}
+#order-hist.open{left:0}
+.oh-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;border-bottom:3px solid var(--yellow);padding-bottom:14px;flex-shrink:0}
+.oh-title{font-size:10px;color:var(--yellow)}
+.btn-oh-close{font-family:'Press Start 2P',monospace;font-size:11px;background:var(--red);color:var(--white);border:3px solid var(--white);padding:7px 11px;cursor:none;box-shadow:3px 3px 0 var(--white)}
+.btn-oh-close:hover{box-shadow:1px 1px 0 var(--white);transform:translate(2px,2px)}
+#oh-list{flex:1;overflow-y:auto}
+.oh-order{margin-bottom:22px;border:2px solid rgba(255,221,0,.25);padding:12px}
+.oh-order-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;padding-bottom:8px;border-bottom:2px solid rgba(255,221,0,.18)}
+.oh-date{font-size:6px;color:var(--gray)}
+.oh-total{font-size:9px;color:var(--yellow)}
+.oh-item{display:flex;gap:8px;align-items:center;padding:6px 0}
+.oh-thumb{width:46px;height:46px;background:#08001a;border:2px solid rgba(0,255,136,.3);object-fit:cover;flex-shrink:0}
+.oh-item-name{font-size:6px;color:var(--white);margin-bottom:3px}
+.oh-item-sub{font-size:5px;color:var(--gray)}
 
 /* ── FOOTER ── */
 footer{background:var(--bg2);border-top:4px solid var(--green);padding:40px 24px;text-align:center}
@@ -286,6 +327,38 @@ footer{background:var(--bg2);border-top:4px solid var(--green);padding:40px 24px
   .card-desc{display:none}
 }
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms !important}}
+
+/* ── PRODUCT DETAIL MODAL ── */
+#pdp{display:none;position:fixed;inset:0;z-index:9600;align-items:center;justify-content:center;padding:16px}
+#pdp.open{display:flex}
+.pdp-backdrop{position:absolute;inset:0;background:rgba(5,0,18,.9)}
+.pdp-panel{position:relative;background:var(--card);border:3px solid var(--cyan);box-shadow:0 0 0 1px var(--cyan),8px 8px 0 var(--cyan),0 0 60px rgba(0,255,255,.2);max-width:820px;width:100%;max-height:90vh;overflow-y:auto;display:flex;flex-direction:column}
+@media(min-width:620px){.pdp-panel{flex-direction:row;max-height:82vh}}
+.pdp-close{position:absolute;top:10px;right:10px;font-family:'Press Start 2P',monospace;font-size:7px;background:var(--red);color:var(--white);border:2px solid var(--white);padding:7px 10px;cursor:none;box-shadow:3px 3px 0 var(--white);z-index:1}
+.pdp-close:hover{box-shadow:1px 1px 0 var(--white);transform:translate(2px,2px)}
+.pdp-img-wrap{flex-shrink:0;width:100%;min-height:250px;background:#08001a;display:flex;align-items:center;justify-content:center;overflow:hidden}
+@media(min-width:620px){.pdp-img-wrap{width:320px;min-height:420px}}
+#pdp-img{width:100%;height:100%;object-fit:cover;display:block;transition:opacity .15s}
+.pdp-info{padding:46px 20px 22px;display:flex;flex-direction:column;gap:14px;flex:1;min-width:0}
+.pdp-badge{font-size:6px;padding:3px 8px;border:2px solid var(--cyan);color:var(--cyan);display:inline-block;width:fit-content}
+.pdp-name{font-size:14px;color:var(--white);text-shadow:0 0 12px var(--cyan);letter-spacing:2px;line-height:1.5}
+.pdp-desc{font-size:7px;color:var(--gray);line-height:2.2}
+.pdp-section-lbl{font-size:5px;color:var(--gray);margin-bottom:4px;letter-spacing:1px}
+.pdp-colors{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.pdp-color-name{font-size:6px;color:var(--cyan);margin-left:2px}
+.pdp-swatch{width:22px;height:22px;border:2px solid rgba(255,255,255,.2);cursor:none;transition:transform .1s,box-shadow .1s}
+.pdp-swatch:hover{transform:scale(1.1)}
+.pdp-swatch.sel{border-color:var(--cyan);box-shadow:0 0 0 2px var(--cyan);transform:scale(1.25)}
+.pdp-sizes{display:flex;gap:7px;flex-wrap:wrap}
+.pdp-sz-btn{font-family:'Press Start 2P',monospace;font-size:6px;background:transparent;color:var(--white);border:2px solid rgba(255,255,255,.25);padding:8px 11px;cursor:none;transition:border-color .1s,color .1s}
+.pdp-sz-btn.sel{border-color:var(--cyan);color:var(--cyan);background:rgba(0,255,255,.07);box-shadow:0 0 8px rgba(0,255,255,.2)}
+.pdp-price{font-size:18px;color:var(--yellow);text-shadow:0 0 10px var(--yellow)}
+.pdp-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:auto;padding-top:6px}
+.pdp-btn-add{font-family:'Press Start 2P',monospace;font-size:8px;background:var(--magenta);color:var(--white);border:3px solid var(--white);padding:13px 16px;cursor:none;box-shadow:4px 4px 0 var(--white);flex:1;min-width:110px;transition:box-shadow .1s,transform .1s}
+.pdp-btn-add:hover{box-shadow:2px 2px 0 var(--white);transform:translate(2px,2px)}
+.pdp-btn-share{font-family:'Press Start 2P',monospace;font-size:7px;background:transparent;color:var(--cyan);border:2px solid var(--cyan);padding:13px 14px;cursor:none;box-shadow:3px 3px 0 var(--cyan);transition:box-shadow .1s,transform .1s}
+.pdp-btn-share:hover{box-shadow:1px 1px 0 var(--cyan);transform:translate(2px,2px)}
+@media(max-width:480px){.pdp-name{font-size:10px}.pdp-price{font-size:14px}}
 </style>
 </head>
 <body>
@@ -306,6 +379,57 @@ footer{background:var(--bg2);border-top:4px solid var(--green);padding:40px 24px
   <p>ALL PRICES: 1 PIXEL COIN!</p>
   <small>(not real — but you're legendary)</small>
   <button onclick="document.getElementById('konami').classList.remove('show')">▶ CONTINUE</button>
+</div>
+
+<!-- ORDER CONFIRMATION MODAL -->
+<div id="order-confirm" role="dialog" aria-modal="true" aria-label="Order confirmed">
+  <div class="oc-backdrop"></div>
+  <div class="oc-panel">
+    <div class="oc-title">★ ORDER COMPLETE! ★</div>
+    <div class="oc-subtitle">YOUR MISSION WAS A SUCCESS, COMMANDER.<br>PRODUCTION STARTS WITHIN 24 HOURS.</div>
+    <div id="oc-items"></div>
+    <div class="oc-total" id="oc-total"></div>
+    <div class="oc-email-note">★ A RECEIPT HAS BEEN SENT TO YOUR EMAIL.<br>SHIPPING CONFIRMATION ARRIVES WHEN YOUR ORDER SHIPS (3–5 BUSINESS DAYS).</div>
+    <button class="oc-close" onclick="closeOrderConfirm()">▶ CONTINUE SHOPPING</button>
+  </div>
+</div>
+
+<!-- ORDER HISTORY PANEL -->
+<aside id="order-hist" aria-label="Order history">
+  <div class="oh-hd">
+    <span class="oh-title">★ ORDER HISTORY</span>
+    <button class="btn-oh-close" onclick="closeOrderHist()" aria-label="Close order history">✕</button>
+  </div>
+  <div id="oh-list"></div>
+</aside>
+
+<!-- PRODUCT DETAIL MODAL -->
+<div id="pdp" role="dialog" aria-modal="true" aria-labelledby="pdp-name">
+  <div class="pdp-backdrop"></div>
+  <div class="pdp-panel">
+    <button class="pdp-close" aria-label="Close product detail">✕ CLOSE</button>
+    <div class="pdp-img-wrap">
+      <img id="pdp-img" src="" alt="">
+    </div>
+    <div class="pdp-info">
+      <div class="pdp-badge" id="pdp-badge"></div>
+      <h2 class="pdp-name" id="pdp-name"></h2>
+      <p class="pdp-desc" id="pdp-desc"></p>
+      <div>
+        <div class="pdp-section-lbl">COLOR</div>
+        <div class="pdp-colors" id="pdp-colors"></div>
+      </div>
+      <div>
+        <div class="pdp-section-lbl">SIZE</div>
+        <div class="pdp-sizes" id="pdp-sizes"></div>
+      </div>
+      <div class="pdp-price" id="pdp-price"></div>
+      <div class="pdp-actions">
+        <button class="pdp-btn-add">+ADD TO CART</button>
+        <button class="pdp-btn-share">&#9658; BEAM</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- INTRO -->
@@ -368,6 +492,7 @@ footer{background:var(--bg2);border-top:4px solid var(--green);padding:40px 24px
       <div class="lives" aria-hidden="true"><div class="heart"></div><div class="heart"></div><div class="heart"></div></div>
     </div>
   </div>
+  <button class="btn-orders" onclick="openOrderHist()" aria-label="View order history">[ORDERS]</button>
   <button class="btn-cart" id="btn-cart" aria-label="Open cart" aria-expanded="false">
     [CART]<span class="cart-badge" id="cart-count" aria-live="polite">0</span>
   </button>
@@ -741,6 +866,8 @@ async function stripeCheckout() {
     });
     const data = await res.json();
     if (data.error) throw new Error(data.error);
+    // Save cart before leaving so we can show order confirmation on return
+    localStorage.setItem('ptPendingOrder', JSON.stringify({ items: [...items], timestamp: Date.now() }));
     window.location.href = data.url;
   } catch (err) {
     btn.textContent = orig;
@@ -750,16 +877,113 @@ async function stripeCheckout() {
   }
 }
 
+// ── ORDER HISTORY HELPERS ──
+function getOrderHistory() {
+  try { return JSON.parse(localStorage.getItem('ptOrderHistory') || '[]'); } catch(e) { return []; }
+}
+
+function showOrderConfirm(order) {
+  document.getElementById('oc-items').innerHTML = order.items.map(item =>
+    `<div class="oc-item">
+      <img src="${item.img}" alt="${item.name}" class="oc-thumb">
+      <div class="oc-item-info">
+        <div class="oc-item-name">${item.name}</div>
+        <div class="oc-item-sub">${item.colorName} / ${item.size}</div>
+        <div class="oc-item-price">$${Number(item.price).toFixed(2)}</div>
+      </div>
+    </div>`
+  ).join('');
+  document.getElementById('oc-total').textContent = 'TOTAL: $' + order.total.toFixed(2);
+  document.getElementById('order-confirm').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  addScore(500);
+}
+
+function closeOrderConfirm() {
+  document.getElementById('order-confirm').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function openOrderHist() {
+  renderOrderHist();
+  document.getElementById('order-hist').classList.add('open');
+}
+
+function closeOrderHist() {
+  document.getElementById('order-hist').classList.remove('open');
+}
+
+function renderOrderHist() {
+  const orders = getOrderHistory();
+  const listEl = document.getElementById('oh-list');
+  if (!orders.length) {
+    listEl.innerHTML = '<div class="cart-empty-msg">NO ORDERS YET.<br>★<br>YOUR MISSION AWAITS.</div>';
+    return;
+  }
+  listEl.innerHTML = orders.map(order => {
+    const date = new Date(order.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    return `<div class="oh-order">
+      <div class="oh-order-hd">
+        <span class="oh-date">${date}</span>
+        <span class="oh-total">$${order.total.toFixed(2)}</span>
+      </div>
+      <div class="oh-items">
+        ${order.items.map(item => `
+          <div class="oh-item">
+            <img src="${item.img}" alt="${item.name}" class="oh-thumb">
+            <div>
+              <div class="oh-item-name">${item.name}</div>
+              <div class="oh-item-sub">${item.colorName} / ${item.size}</div>
+            </div>
+          </div>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
 // Handle Stripe redirect back from checkout
 (function checkOrderStatus() {
   const p = new URLSearchParams(window.location.search);
   if (p.get('order') === 'success') {
+    const pendingRaw = localStorage.getItem('ptPendingOrder');
+    let pendingOrder = null;
+    try { pendingOrder = JSON.parse(pendingRaw || 'null'); } catch(e) {}
+
+    // Clear cart
     items = [];
     renderCart();
-    setTimeout(() => ach('ORDER COMPLETE! THANK YOU! ★'), 800);
+    localStorage.removeItem('ptPendingOrder');
     window.history.replaceState({}, '', window.location.pathname);
+
+    if (pendingOrder && pendingOrder.items && pendingOrder.items.length) {
+      const total = pendingOrder.items.reduce((s, i) => s + Number(i.price), 0);
+      const order = {
+        sessionId: p.get('session') || 'unknown',
+        date: Date.now(),
+        items: pendingOrder.items,
+        total,
+      };
+      const history = getOrderHistory();
+      history.unshift(order);
+      localStorage.setItem('ptOrderHistory', JSON.stringify(history.slice(0, 50)));
+      setTimeout(() => { showOrderConfirm(order); ach('ORDER COMPLETE! THANK YOU! ★'); }, 400);
+    } else {
+      setTimeout(() => ach('ORDER COMPLETE! THANK YOU! ★'), 400);
+    }
   } else if (p.get('order') === 'cancelled') {
-    setTimeout(() => ach('CHECKOUT CANCELLED — CART SAVED!'), 800);
+    // Restore cart if it's empty (user hit back from Stripe)
+    const pendingRaw = localStorage.getItem('ptPendingOrder');
+    if (pendingRaw && !items.length) {
+      try {
+        const pending = JSON.parse(pendingRaw);
+        items = pending.items || [];
+        renderCart();
+        ach('CHECKOUT CANCELLED — CART RESTORED!');
+      } catch(e) { ach('CHECKOUT CANCELLED.'); }
+    } else {
+      ach('CHECKOUT CANCELLED.');
+    }
+    localStorage.removeItem('ptPendingOrder');
     window.history.replaceState({}, '', window.location.pathname);
   }
 })();
@@ -918,9 +1142,103 @@ function renderGrid(filter) {
 }
 renderGrid('all');
 
+// ── PRODUCT DETAIL MODAL ──
+let pdpProduct = null;
+
+function openPDP(productId) {
+  const p = PRODUCTS.find(x => x.id === productId);
+  if (!p) return;
+  pdpProduct = p;
+  const defaultColor = p.cat === 'characters' && p.colors.includes('White') ? 'White' : p.colors[0];
+  const img = document.getElementById('pdp-img');
+  img.src = getVariantUrl(p.img, defaultColor);
+  img.alt = p.name + ' shirt';
+  document.getElementById('pdp-name').textContent = p.name;
+  document.getElementById('pdp-desc').textContent = p.desc;
+  document.getElementById('pdp-price').textContent = '★ $' + p.price.toFixed(2);
+  const badge = document.getElementById('pdp-badge');
+  if (p.isNew) { badge.textContent = '★ NEW DROP'; badge.style.borderColor = 'var(--yellow)'; badge.style.color = 'var(--yellow)'; }
+  else { badge.textContent = p.cat.toUpperCase(); badge.style.borderColor = 'var(--cyan)'; badge.style.color = 'var(--cyan)'; }
+  document.getElementById('pdp-colors').innerHTML = p.colors.map(c =>
+    `<span class="pdp-swatch${c===defaultColor?' sel':''}" data-color="${c}" style="background:${COLOR_HEX[c]||'#888'}" title="${c}"></span>`
+  ).join('') + `<span class="pdp-color-name" id="pdp-color-name">${defaultColor}</span>`;
+  document.getElementById('pdp-sizes').innerHTML = ['S','M','L','XL','2XL','3XL'].map((s,i) =>
+    `<button class="pdp-sz-btn${i===2?' sel':''}" data-size="${s}">${s}</button>`
+  ).join('');
+  document.getElementById('pdp').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closePDP() {
+  document.getElementById('pdp').classList.remove('open');
+  document.body.style.overflow = '';
+  pdpProduct = null;
+}
+
+document.getElementById('pdp').addEventListener('click', e => {
+  if (e.target === document.getElementById('pdp') || e.target.classList.contains('pdp-backdrop')) { closePDP(); return; }
+  if (e.target.closest('.pdp-close')) { closePDP(); return; }
+  const sw = e.target.closest('.pdp-swatch');
+  if (sw) {
+    document.querySelectorAll('#pdp-colors .pdp-swatch').forEach(s => s.classList.remove('sel'));
+    sw.classList.add('sel');
+    const colorName = sw.dataset.color;
+    const nameEl = document.getElementById('pdp-color-name');
+    if (nameEl) nameEl.textContent = colorName;
+    const img = document.getElementById('pdp-img');
+    img.style.opacity = '0.5';
+    img.src = getVariantUrl(pdpProduct.img, colorName);
+    img.onload = () => { img.style.opacity = '1'; };
+    return;
+  }
+  const sz = e.target.closest('.pdp-sz-btn');
+  if (sz) {
+    document.querySelectorAll('.pdp-sz-btn').forEach(b => b.classList.remove('sel'));
+    sz.classList.add('sel');
+    return;
+  }
+  if (e.target.closest('.pdp-btn-add') && pdpProduct) {
+    const selSw = document.querySelector('#pdp-colors .pdp-swatch.sel');
+    const colorName = selSw?.dataset.color || pdpProduct.colors[0];
+    const selSz = document.querySelector('.pdp-sz-btn.sel');
+    const size = selSz?.dataset.size || 'L';
+    const imgUrl = document.getElementById('pdp-img').src;
+    items.push({ name:pdpProduct.name, price:pdpProduct.price, colorName, color:COLOR_HEX[colorName]||'#111', size, img:imgUrl, productId:pdpProduct.id, variantId:lookupVariantId(pdpProduct, colorName, size) });
+    renderCart(); openCart(); closePDP();
+    const pts = Math.round(pdpProduct.price * 10);
+    addScore(pts);
+    if (!achFlags.first) { achFlags.first=true; ach('FIRST PURCHASE! GREAT TASTE!'); }
+    else if (items.length===3&&!achFlags.three) { achFlags.three=true; ach('COLLECTOR! 3 ITEMS IN CART!'); }
+    else if (items.length===5&&!achFlags.five) { achFlags.five=true; ach('HIGH ROLLER! 5 ITEMS! LEGEND!'); }
+    return;
+  }
+  if (e.target.closest('.pdp-btn-share') && pdpProduct) {
+    const shareData = { title: 'PIXEL THREADS — ' + pdpProduct.name, text: pdpProduct.desc, url: window.location.href };
+    if (navigator.share) { navigator.share(shareData).catch(()=>{}); }
+    else { navigator.clipboard?.writeText(window.location.href).then(() => ach('LINK COPIED!')); }
+    return;
+  }
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && document.getElementById('pdp').classList.contains('open')) closePDP();
+});
+
 // ── GRID INTERACTIONS (delegated) ──
 const achFlags = {};
 document.getElementById('grid').addEventListener('click', e => {
+
+  // Open modal on card image or name click
+  const cardImg = e.target.closest('.card-img');
+  if (cardImg && !e.target.closest('.swatch') && !e.target.closest('.sz-btn') && !e.target.closest('.btn-add') && !e.target.closest('.btn-share')) {
+    const card = cardImg.closest('.card');
+    if (card) { openPDP(card.dataset.id); return; }
+  }
+  const cardName = e.target.closest('.card-name');
+  if (cardName) {
+    const card = cardName.closest('.card');
+    if (card) { openPDP(card.dataset.id); return; }
+  }
 
   // Color swatch
   const sw = e.target.closest('.swatch');
