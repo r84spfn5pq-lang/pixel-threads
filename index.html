@@ -231,6 +231,16 @@ body{background:var(--bg);color:var(--green);font-family:'Press Start 2P',monosp
 .oh-thumb{width:46px;height:46px;background:#08001a;border:2px solid rgba(0,255,136,.3);object-fit:cover;flex-shrink:0}
 .oh-item-name{font-size:6px;color:var(--white);margin-bottom:3px}
 .oh-item-sub{font-size:5px;color:var(--gray)}
+.oh-lookup{background:rgba(0,255,255,.04);border:2px solid rgba(0,255,255,.2);padding:14px;margin-bottom:18px}
+.oh-lookup-lbl{font-size:5px;color:var(--gray);margin-bottom:10px;letter-spacing:1px;line-height:1.8}
+.oh-lookup-row{display:flex;gap:8px}
+.oh-email-input{flex:1;font-family:'Press Start 2P',monospace;font-size:6px;background:var(--bg);color:var(--cyan);border:2px solid var(--cyan);padding:8px 10px;outline:none;min-width:0}
+.oh-email-input::placeholder{color:var(--gray)}
+.oh-lookup-btn{font-family:'Press Start 2P',monospace;font-size:6px;background:var(--cyan);color:var(--bg);border:2px solid var(--white);padding:8px 10px;cursor:none;white-space:nowrap;box-shadow:2px 2px 0 var(--white);flex-shrink:0}
+.oh-lookup-btn:hover{box-shadow:1px 1px 0 var(--white);transform:translate(1px,1px)}
+.oh-lookup-msg{font-size:6px;color:var(--gray);margin-top:8px;min-height:14px;line-height:1.8}
+.oh-lookup-msg.err{color:var(--red)}
+.oh-lookup-msg.ok{color:var(--green)}
 
 /* ── FOOTER ── */
 footer{background:var(--bg2);border-top:4px solid var(--green);padding:40px 24px;text-align:center}
@@ -399,6 +409,14 @@ footer{background:var(--bg2);border-top:4px solid var(--green);padding:40px 24px
   <div class="oh-hd">
     <span class="oh-title">★ ORDER HISTORY</span>
     <button class="btn-oh-close" onclick="closeOrderHist()" aria-label="Close order history">✕</button>
+  </div>
+  <div class="oh-lookup">
+    <div class="oh-lookup-lbl">ENTER YOUR EMAIL TO SEE ALL ORDERS</div>
+    <div class="oh-lookup-row">
+      <input type="email" id="oh-email" class="oh-email-input" placeholder="your@email.com" autocomplete="email" spellcheck="false">
+      <button class="oh-lookup-btn" onclick="lookupOrders()">▶ GO</button>
+    </div>
+    <div id="oh-lookup-msg" class="oh-lookup-msg"></div>
   </div>
   <div id="oh-list"></div>
 </aside>
@@ -907,38 +925,90 @@ function closeOrderConfirm() {
 function openOrderHist() {
   renderOrderHist();
   document.getElementById('order-hist').classList.add('open');
+  // Allow Enter key in email field
+  const emailEl = document.getElementById('oh-email');
+  if (emailEl && !emailEl._bound) {
+    emailEl._bound = true;
+    emailEl.addEventListener('keydown', e => { if (e.key === 'Enter') lookupOrders(); });
+  }
 }
 
 function closeOrderHist() {
   document.getElementById('order-hist').classList.remove('open');
 }
 
-function renderOrderHist() {
-  const orders = getOrderHistory();
+function renderOrderHist(orders) {
   const listEl = document.getElementById('oh-list');
-  if (!orders.length) {
-    listEl.innerHTML = '<div class="cart-empty-msg">NO ORDERS YET.<br>★<br>YOUR MISSION AWAITS.</div>';
+  const source = orders || getOrderHistory();
+  if (!source.length) {
+    listEl.innerHTML = '<div class="cart-empty-msg">NO ORDERS FOUND.<br>★<br>TRY ENTERING YOUR EMAIL ABOVE.</div>';
     return;
   }
-  listEl.innerHTML = orders.map(order => {
-    const date = new Date(order.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  listEl.innerHTML = source.map(order => {
+    const date = new Date((order.created || order.date / 1000 || 0) * (order.created ? 1000 : 1)).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    const total = order.amount_total ? (order.amount_total / 100).toFixed(2) : (order.total || 0).toFixed(2);
+    const lineItems = order.line_items || order.items?.map(i => ({ name: i.name, amount: Math.round(i.price * 100) })) || [];
+    const imgItems = order.items || [];
     return `<div class="oh-order">
       <div class="oh-order-hd">
         <span class="oh-date">${date}</span>
-        <span class="oh-total">$${order.total.toFixed(2)}</span>
+        <span class="oh-total">$${total}</span>
       </div>
       <div class="oh-items">
-        ${order.items.map(item => `
+        ${imgItems.length ? imgItems.map(item => `
           <div class="oh-item">
             <img src="${item.img}" alt="${item.name}" class="oh-thumb">
             <div>
               <div class="oh-item-name">${item.name}</div>
               <div class="oh-item-sub">${item.colorName} / ${item.size}</div>
             </div>
+          </div>`).join('') : lineItems.map(item => `
+          <div class="oh-item">
+            <div style="width:46px;height:46px;background:#08001a;border:2px solid rgba(0,255,136,.3);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px">★</div>
+            <div>
+              <div class="oh-item-name">${item.name}</div>
+              <div class="oh-item-sub">$${(item.amount / 100).toFixed(2)}</div>
+            </div>
           </div>`).join('')}
       </div>
     </div>`;
   }).join('');
+}
+
+async function lookupOrders() {
+  const emailEl = document.getElementById('oh-email');
+  const msgEl = document.getElementById('oh-lookup-msg');
+  const btn = document.querySelector('.oh-lookup-btn');
+  const email = (emailEl?.value || '').trim();
+  if (!email || !email.includes('@')) {
+    msgEl.textContent = 'PLEASE ENTER A VALID EMAIL.';
+    msgEl.className = 'oh-lookup-msg err';
+    return;
+  }
+  btn.textContent = '⌛';
+  btn.disabled = true;
+  msgEl.textContent = 'SEARCHING...';
+  msgEl.className = 'oh-lookup-msg';
+  try {
+    const res = await fetch(`/.netlify/functions/lookup-orders?email=${encodeURIComponent(email)}`);
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    if (!data.orders || data.orders.length === 0) {
+      msgEl.textContent = 'NO ORDERS FOUND FOR THAT EMAIL.';
+      msgEl.className = 'oh-lookup-msg err';
+      document.getElementById('oh-list').innerHTML = '';
+    } else {
+      msgEl.textContent = `FOUND ${data.orders.length} ORDER${data.orders.length > 1 ? 'S' : ''}.`;
+      msgEl.className = 'oh-lookup-msg ok';
+      renderOrderHist(data.orders);
+    }
+  } catch(err) {
+    msgEl.textContent = 'LOOKUP FAILED. TRY AGAIN.';
+    msgEl.className = 'oh-lookup-msg err';
+  } finally {
+    btn.textContent = '▶ GO';
+    btn.disabled = false;
+  }
 }
 
 // Handle Stripe redirect back from checkout
