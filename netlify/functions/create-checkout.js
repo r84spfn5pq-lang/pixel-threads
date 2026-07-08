@@ -68,7 +68,7 @@ exports.handler = async function(event) {
 
     const params = {
       mode: 'payment',
-      success_url: `${origin}/?order=success`,
+      success_url: `${origin}/?order=success&session={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/?order=cancelled`,
       'payment_method_types[0]': 'card',
       'shipping_address_collection[allowed_countries][0]': 'US',
