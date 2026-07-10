@@ -1,22 +1,20 @@
 const https = require('https');
 
-exports.handler = async function(event) {
-  if (event.httpMethod === 'OPTIONS') {
-    return { statusCode: 200, headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'Content-Type', 'Access-Control-Allow-Methods': 'GET, OPTIONS' }, body: '' };
-  }
-  if (event.httpMethod !== 'GET') {
-    return { statusCode: 405, body: JSON.stringify({ error: 'Method not allowed' }) };
-  }
+module.exports = async (req, res) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
 
-  const sessionId = event.queryStringParameters?.session;
+  if (req.method === 'OPTIONS') return res.status(200).end();
+  if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
+
+  const sessionId = req.query.session;
   if (!sessionId || !sessionId.startsWith('cs_')) {
-    return { statusCode: 400, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }, body: JSON.stringify({ error: 'Invalid session ID' }) };
+    return res.status(400).json({ error: 'Invalid session ID' });
   }
 
   const secretKey = process.env.STRIPE_SECRET_KEY;
-  if (!secretKey) {
-    return { statusCode: 500, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }, body: JSON.stringify({ error: 'Not configured' }) };
-  }
+  if (!secretKey) return res.status(500).json({ error: 'Not configured' });
 
   return new Promise((resolve) => {
     const options = {
@@ -28,18 +26,14 @@ exports.handler = async function(event) {
         'Stripe-Version': '2024-06-20',
       },
     };
-    const req = https.request(options, res => {
+    const request = https.request(options, response => {
       let data = '';
-      res.on('data', chunk => data += chunk);
-      res.on('end', () => {
+      response.on('data', chunk => data += chunk);
+      response.on('end', () => {
         try {
           const session = JSON.parse(data);
-          if (session.error) {
-            resolve({ statusCode: 400, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }, body: JSON.stringify({ error: session.error.message }) });
-            return;
-          }
-          // Return only the fields the frontend needs
-          const order = {
+          if (session.error) { res.status(400).json({ error: session.error.message }); return resolve(); }
+          res.status(200).json({
             id: session.id,
             created: session.created,
             amount_total: session.amount_total,
@@ -52,14 +46,12 @@ exports.handler = async function(event) {
               quantity: item.quantity,
               amount: item.amount_total,
             })),
-          };
-          resolve({ statusCode: 200, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }, body: JSON.stringify(order) });
-        } catch (e) {
-          resolve({ statusCode: 500, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }, body: JSON.stringify({ error: 'Failed to parse response' }) });
-        }
+          });
+          resolve();
+        } catch (e) { res.status(500).json({ error: 'Failed to parse response' }); resolve(); }
       });
     });
-    req.on('error', () => resolve({ statusCode: 500, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }, body: JSON.stringify({ error: 'Request failed' }) }));
-    req.end();
+    request.on('error', () => { res.status(500).json({ error: 'Request failed' }); resolve(); });
+    request.end();
   });
 };
