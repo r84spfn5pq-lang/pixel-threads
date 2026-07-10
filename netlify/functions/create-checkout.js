@@ -29,49 +29,30 @@ function stripePost(path, secretKey, params) {
   });
 }
 
-exports.handler = async function(event) {
-  if (event.httpMethod === 'OPTIONS') {
-    return {
-      statusCode: 200,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      },
-      body: '',
-    };
-  }
+module.exports = async (req, res) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
 
-  if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, body: JSON.stringify({ error: 'Method not allowed' }) };
-  }
+  if (req.method === 'OPTIONS') return res.status(200).end();
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
-    const { items } = JSON.parse(event.body);
-    if (!items || !items.length) {
-      return { statusCode: 400, body: JSON.stringify({ error: 'No items in cart' }) };
-    }
+    const { items } = req.body;
+    if (!items || !items.length) return res.status(400).json({ error: 'No items in cart' });
 
-    const origin = event.headers.origin || 'https://pixelthreads.netlify.app';
+    const origin = req.headers.origin || 'https://pixelthreads.vercel.app';
     const secretKey = process.env.STRIPE_SECRET_KEY;
+    if (!secretKey) throw new Error('STRIPE_SECRET_KEY is not configured');
 
-    if (!secretKey) {
-      throw new Error('STRIPE_SECRET_KEY is not configured');
-    }
-
-    const fulfillment = JSON.stringify(
-      items.map(item => ({ p: item.productId, v: item.variantId }))
-    );
+    const fulfillment = JSON.stringify(items.map(item => ({ p: item.productId, v: item.variantId })));
 
     const params = {
       mode: 'payment',
       success_url: `${origin}/?order=success&session={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/?order=cancelled`,
       'payment_method_types[0]': 'card',
-      // Required billing address guarantees customer_details.address is always populated.
-      // This is the most reliable way to collect a full address in Stripe Checkout.
       billing_address_collection: 'required',
-      // Shipping collection puts address in shipping_details when it works.
       'shipping_address_collection[allowed_countries][0]': 'US',
       'shipping_address_collection[allowed_countries][1]': 'CA',
       'shipping_address_collection[allowed_countries][2]': 'GB',
@@ -99,25 +80,12 @@ exports.handler = async function(event) {
       console.error('Stripe API error:', JSON.stringify(session.error));
       throw new Error(session.error.message);
     }
+    if (!session.url) throw new Error('Stripe did not return a checkout URL');
 
-    if (!session.url) {
-      console.error('No URL in Stripe response:', JSON.stringify(session));
-      throw new Error('Stripe did not return a checkout URL');
-    }
-
-    console.log('Session created:', session.id, '| billing_address_collection:', session.billing_address_collection, '| shipping_address_collection:', JSON.stringify(session.shipping_address_collection));
-
-    return {
-      statusCode: 200,
-      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
-      body: JSON.stringify({ url: session.url }),
-    };
+    console.log('Session created:', session.id);
+    return res.status(200).json({ url: session.url });
   } catch (err) {
     console.error('Checkout error:', err.message);
-    return {
-      statusCode: 500,
-      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
-      body: JSON.stringify({ error: err.message }),
-    };
+    return res.status(500).json({ error: err.message });
   }
 };
