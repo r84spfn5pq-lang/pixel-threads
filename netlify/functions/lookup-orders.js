@@ -13,42 +13,34 @@ function httpsGet(hostname, path, headers) {
   });
 }
 
-exports.handler = async function(event) {
-  const cors = { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' };
+module.exports = async (req, res) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
 
-  if (event.httpMethod === 'OPTIONS') {
-    return { statusCode: 200, headers: { ...cors, 'Access-Control-Allow-Headers': 'Content-Type', 'Access-Control-Allow-Methods': 'GET, OPTIONS' }, body: '' };
-  }
-  if (event.httpMethod !== 'GET') {
-    return { statusCode: 405, headers: cors, body: JSON.stringify({ error: 'Method not allowed' }) };
-  }
+  if (req.method === 'OPTIONS') return res.status(200).end();
+  if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
 
-  const email = (event.queryStringParameters?.email || '').trim().toLowerCase();
+  const email = (req.query.email || '').trim().toLowerCase();
   if (!email || !email.includes('@') || !email.includes('.')) {
-    return { statusCode: 400, headers: cors, body: JSON.stringify({ error: 'Valid email required' }) };
+    return res.status(400).json({ error: 'Valid email required' });
   }
 
   const secretKey = process.env.STRIPE_SECRET_KEY;
-  if (!secretKey) return { statusCode: 500, headers: cors, body: JSON.stringify({ error: 'Not configured' }) };
+  if (!secretKey) return res.status(500).json({ error: 'Not configured' });
 
   const stripeHdrs = { 'Authorization': `Bearer ${secretKey}`, 'Stripe-Version': '2024-06-20' };
 
   try {
-    // Find customer by email
     const search = await httpsGet('api.stripe.com',
       `/v1/customers/search?query=email:"${encodeURIComponent(email)}"&limit=3`,
       stripeHdrs
     );
 
-    if (!search.data || search.data.length === 0) {
-      return { statusCode: 200, headers: cors, body: JSON.stringify({ orders: [] }) };
-    }
+    if (!search.data || search.data.length === 0) return res.status(200).json({ orders: [] });
 
-    const customerId = search.data[0].id;
-
-    // List checkout sessions for this customer (expand line_items)
     const sessions = await httpsGet('api.stripe.com',
-      `/v1/checkout/sessions?customer=${customerId}&limit=20&expand[]=data.line_items`,
+      `/v1/checkout/sessions?customer=${search.data[0].id}&limit=20&expand[]=data.line_items`,
       stripeHdrs
     );
 
@@ -67,10 +59,9 @@ exports.handler = async function(event) {
         shipping_name: s.shipping_details?.name || s.customer_details?.name,
       }));
 
-    return { statusCode: 200, headers: cors, body: JSON.stringify({ orders }) };
-
+    return res.status(200).json({ orders });
   } catch(err) {
     console.error('Lookup error:', err.message);
-    return { statusCode: 500, headers: cors, body: JSON.stringify({ error: 'Lookup failed. Please try again.' }) };
+    return res.status(500).json({ error: 'Lookup failed. Please try again.' });
   }
 };
