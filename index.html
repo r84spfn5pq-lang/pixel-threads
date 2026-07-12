@@ -242,6 +242,19 @@ body{background:var(--bg);color:var(--green);font-family:'Press Start 2P',monosp
 .oh-lookup-msg.err{color:var(--red)}
 .oh-lookup-msg.ok{color:var(--green)}
 
+/* ── INFO MODALS ── */
+.info-modal{display:none;position:fixed;inset:0;z-index:9700;align-items:center;justify-content:center;padding:16px}
+.info-modal.open{display:flex}
+.info-backdrop{position:absolute;inset:0;background:rgba(5,0,18,.92)}
+.info-panel{position:relative;background:var(--card);border:3px solid var(--cyan);box-shadow:0 0 0 1px var(--cyan),6px 6px 0 var(--cyan),0 0 40px rgba(0,255,255,.15);max-width:560px;width:100%;padding:32px;max-height:85vh;overflow-y:auto}
+.info-title{font-size:11px;color:var(--cyan);text-shadow:0 0 10px var(--cyan);margin-bottom:20px}
+.info-body{font-size:7px;color:var(--gray);line-height:2.4}
+.info-body p{margin-bottom:14px}
+.info-body a{color:var(--cyan);text-decoration:none}
+.info-body a:hover{color:var(--green)}
+.info-close{font-family:'Press Start 2P',monospace;font-size:7px;background:transparent;color:var(--cyan);border:2px solid var(--cyan);padding:8px 14px;cursor:none;margin-top:20px;display:block}
+.info-close:hover{background:var(--cyan);color:var(--bg)}
+
 /* ── FOOTER ── */
 footer{background:var(--bg2);border-top:4px solid var(--green);padding:40px 24px;text-align:center}
 .ft-logo{font-size:13px;color:var(--cyan);text-shadow:0 0 14px var(--cyan);margin-bottom:18px}
@@ -659,11 +672,44 @@ footer{background:var(--bg2);border-top:4px solid var(--green);padding:40px 24px
   </div>
 </section>
 
+<!-- RETURNS MODAL -->
+<div id="modal-returns" class="info-modal" role="dialog" aria-modal="true" aria-label="Returns policy">
+  <div class="info-backdrop" onclick="closeInfoModal('returns')"></div>
+  <div class="info-panel">
+    <div class="info-title">★ RETURNS & EXCHANGES</div>
+    <div class="info-body">
+      <p>We want you to love what you ordered — and if something isn't right, we're here to help.</p>
+      <p>Since every Pixel Threads item is printed on demand just for you, we're unable to accept returns due to change of mind. However, we absolutely stand behind our products.</p>
+      <p><span style="color:var(--cyan)">WE WILL MAKE IT RIGHT IF:</span><br>
+      — Your item arrives damaged or defective<br>
+      — You received the wrong item or size<br>
+      — There is a print quality issue</p>
+      <p>Simply reach out to us within <span style="color:var(--yellow)">30 days</span> of delivery with your order number and a photo of the issue, and we'll send a replacement or issue a refund — no hassle.</p>
+      <p>For any questions, contact us at <a href="mailto:PixelThreadsContact@gmail.com">PixelThreadsContact@gmail.com</a> and we'll get back to you as soon as possible.</p>
+    </div>
+    <button class="info-close" onclick="closeInfoModal('returns')">✕ CLOSE</button>
+  </div>
+</div>
+
+<!-- CONTACT MODAL -->
+<div id="modal-contact" class="info-modal" role="dialog" aria-modal="true" aria-label="Contact us">
+  <div class="info-backdrop" onclick="closeInfoModal('contact')"></div>
+  <div class="info-panel">
+    <div class="info-title">★ CONTACT US</div>
+    <div class="info-body">
+      <p style="text-align:center;font-size:9px;color:var(--cyan);margin-bottom:20px"><a href="mailto:PixelThreadsContact@gmail.com">PixelThreadsContact@gmail.com</a></p>
+      <p style="text-align:center">We appreciate you reaching out! Whether you have a question about your order, need help with sizing, or just want to talk pixels — we'd love to hear from you. We typically respond within 1–2 business days.</p>
+      <p style="text-align:center;color:var(--green)">Thank you for being part of the Pixel Threads crew. ★</p>
+    </div>
+    <button class="info-close" onclick="closeInfoModal('contact')" style="margin:20px auto 0;display:block">✕ CLOSE</button>
+  </div>
+</div>
+
 <!-- FOOTER -->
 <footer>
   <div class="ft-logo">PIXEL THREADS</div>
   <nav class="ft-links" aria-label="Footer">
-    <a href="#">ABOUT</a><a href="#">SIZING</a><a href="#">RETURNS</a><a href="#">ETSY SHOP</a><a href="#">CONTACT</a>
+    <a href="#">ABOUT</a><a href="#">SIZING</a><a href="#" onclick="openInfoModal('returns');return false;">RETURNS</a><a href="#">ETSY SHOP</a><a href="#" onclick="openInfoModal('contact');return false;">CONTACT</a>
     <a href="#" onclick="openOrderHist();return false;" style="color:var(--yellow);border:2px solid var(--yellow);padding:4px 10px">★ MY ORDERS</a>
   </nav>
   <p class="ft-copy">
@@ -942,6 +988,15 @@ function openOrderHist() {
 
 function closeOrderHist() {
   document.getElementById('order-hist').classList.remove('open');
+}
+
+function openInfoModal(id) {
+  document.getElementById('modal-' + id).classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeInfoModal(id) {
+  document.getElementById('modal-' + id).classList.remove('open');
+  document.body.style.overflow = '';
 }
 
 function renderOrderHist(orders) {
